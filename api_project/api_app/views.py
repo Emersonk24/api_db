@@ -83,3 +83,87 @@ class EliminarPersona(generics.DestroyAPIView):
             {'success': True, 'detail': 'Persona eliminada correctamente'},
             status=status.HTTP_204_NO_CONTENT
         )
+
+#  Listar tareas
+class tareaList(generics.ListCreateAPIView):
+    queryset = tarea.objects.all()
+    serializer_class = TareaSerializer
+
+    def get(self, request):
+        tareas = tarea.objects.all()
+        serializer = TareaSerializer(tareas, many=True)
+        if not tareas:
+            raise NotFound("No se encontraron tareas")
+        return Response({'success': True, 'detail': 'Listando tareas', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+#  Crear tareas
+class tareaCrear(generics.CreateAPIView):
+    queryset = tarea.objects.all()
+    serializer_class = TareaSerializer
+
+    def post(self, request):
+        serializer = TareaSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'success': True, 'detail': 'Tarea creada', 'data': serializer.data}, status=status.HTTP_201_CREATED)
+
+
+#  Actualizar tareas
+class ActualizarTarea(generics.UpdateAPIView):
+    queryset = tarea.objects.all()
+    serializer_class = TareaSerializer
+
+    def put(self, request, pk):
+        tareas = get_object_or_404(tarea, pk=pk)
+        serializer = TareaSerializer(tareas, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({'success': True, 'detail': 'Tarea actualizada', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+#  Eliminar tareas
+class EliminarTarea(generics.DestroyAPIView):
+    queryset = tarea.objects.all()
+    serializer_class = TareaSerializer
+
+    def delete(self, request, pk):
+        tareas = get_object_or_404(tarea, pk=pk)
+        tareas.delete()
+        return Response({'success': True, 'detail': 'Tarea eliminada correctamente'}, status=status.HTTP_204_NO_CONTENT)
+
+
+#  Buscar tareas por fecha
+class tareaByfecha(generics.ListAPIView):
+    serializer_class = TareaSerializer
+
+    def get(self, request, fecha):
+        tareas = tarea.objects.filter(fecha_limite=fecha)
+        if not tareas:
+            return Response({'detail': 'No se encontraron tareas con esa fecha.'})
+        serializer = TareaSerializer(tareas, many=True)
+        return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+# Buscar tareas por rango de fechas
+class tareaByrangofecha(generics.ListAPIView):
+    serializer_class = TareaSerializer
+
+    def get(self, request, fecha_inicio, fecha_fin):
+        tareas = tarea.objects.filter(fecha_limite__range=[fecha_inicio, fecha_fin])
+        if not tareas:
+            return Response({'detail': 'No se encontraron tareas en ese rango de fechas.'})
+        serializer = TareaSerializer(tareas, many=True)
+        return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)
+
+
+# Buscar tareas por persona
+class tareaBypersona(generics.ListAPIView):
+    serializer_class = TareaSerializer
+
+    def get(self, request, persona_id):
+        tareas = tarea.objects.filter(persona__id_personas=persona_id)
+        if not tareas:
+            return Response({'detail': 'No se encontraron tareas para esa persona.'})
+        serializer = TareaSerializer(tareas, many=True)
+        return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)
