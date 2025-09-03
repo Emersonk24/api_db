@@ -15,6 +15,7 @@ class personas(models.Model):
         db_table = 'T001Personas'
         verbose_name = 'Persona'
         verbose_name_plural = 'Personas'
+        
 class tareas(models.Model):
     id_tareas = models.AutoField(primary_key=True,editable=False,db_column= 'T002Idtarea')
     titulo = models.CharField(max_length=200,db_column= 'T002Titulo')

@@ -1,36 +1,34 @@
 from django.shortcuts import render
-from.models import persona
-from .models import tarea
+from .models import personas
+from .models import tareas
 from .serializers import PersonaSerializer, TareaSerializer
 from rest_framework import generics
 from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-from api_project.api_app.models import *
-from api_project.api_app.serializers import *
 from django.shortcuts import get_object_or_404
 
 
 
 class personaList(generics.ListCreateAPIView):
-    queryset = persona.objects.all()
+    queryset = personas.objects.all()
     serializer_class = PersonaSerializer
 
     def get(self,request):
-        personas =personas.objects.all()
-        serializer = PersonaSerializer(personas, many=True)
+        personas_qs =personas.objects.all()
+        serializer = PersonaSerializer(personas_qs, many=True)
         if not personas:
             raise NotFound("no se encontraron personas")          
         return Response({ 'success': True,'detail':'listando de personas ' ,'data': serializer.data },status=status.HTTP_200_OK)
         
 # crear personas 
 class personalista(generics.CreateAPIView):
-    queryset = persona.objects.all()
+    queryset = personas.objects.all()
     serializer_class = PersonaSerializer
 
     def post(self,request):
-        personas = persona.objects.all()
+        personas = personas.objects.all()
         serializer = PersonaSerializer(data=request.data)
         def post(self,request):
             serializer = PersonaSerializer(data=request.data)
@@ -41,19 +39,19 @@ class personalista(generics.CreateAPIView):
 # actuliizar personas
 
 class Actualizarpersona(generics.UpdateAPIView):
-    queryset = persona.objects.all()
+    queryset = personas.objects.all()
     serializer_class = PersonaSerializer
 
     def put(self,request,pk):
-            personas = get_object_or_404(persona, pk=pk)
+            personas_obj = get_object_or_404(personas, pk=pk)
             email = request.data.get('email',None)
            
-            if email and personas.email != email:
-                if persona.objects.filter(email=email).extists(pk=pk).extists():
+            if email and personas_obj.email != email:
+                if personas.objects.filter(email=email).exclude(pk=pk).exclude():
                     return Response({'email':['persona with this email already exists .'] },status=status.HTTP_400_BAD_REQUEST)
 
 
-            serializer = PersonaSerializer(personas, data=request.data)
+            serializer = PersonaSerializer(personas_obj, data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response({ 'success': True,'detail':'persona actualizada' ,'data': serializer.data },status=status.HTTP_200_OK)
@@ -64,21 +62,21 @@ class personaByDocumento(generics.RetrieveAPIView):
     serializer_class = PersonaSerializer
 
     def get(self, request, documento):
-        personas = persona.objects.filter(documento=documento).first()
-        if not personas:
+        personas_obj = personas.objects.filter(documento=documento).first()
+        if not personas_obj:
             return Response({'detail':'no se encontro persona con ese documeto. '})
-        serializer = PersonaSerializer(personas)
+        serializer = PersonaSerializer(personas_obj)
         return Response({ 'success': True,'detail':'persona encontrada' ,'data': serializer.data },status=status.HTTP_200_OK)
     
 # eliminar personas 
 
 class EliminarPersona(generics.DestroyAPIView):
-    queryset = persona.objects.all()
+    queryset = personas.objects.all()
     serializer_class = PersonaSerializer
 
     def delete(self, request, pk):
-        personas = get_object_or_404(persona, pk=pk)
-        personas.delete()
+        personas_qs = get_object_or_404(personas, pk=pk)
+        personas_qs.delete()
         return Response(
             {'success': True, 'detail': 'Persona eliminada correctamente'},
             status=status.HTTP_204_NO_CONTENT
@@ -86,12 +84,12 @@ class EliminarPersona(generics.DestroyAPIView):
 
 #  Listar tareas
 class tareaList(generics.ListCreateAPIView):
-    queryset = tarea.objects.all()
+    queryset = tareas.objects.all()
     serializer_class = TareaSerializer
 
     def get(self, request):
-        tareas = tarea.objects.all()
-        serializer = TareaSerializer(tareas, many=True)
+        tareas_qs = tareas.objects.all()
+        serializer = TareaSerializer(tareas_qs, many=True)
         if not tareas:
             raise NotFound("No se encontraron tareas")
         return Response({'success': True, 'detail': 'Listando tareas', 'data': serializer.data}, status=status.HTTP_200_OK)
@@ -99,7 +97,7 @@ class tareaList(generics.ListCreateAPIView):
 
 #  Crear tareas
 class tareaCrear(generics.CreateAPIView):
-    queryset = tarea.objects.all()
+    queryset = tareas.objects.all()
     serializer_class = TareaSerializer
 
     def post(self, request):
@@ -111,12 +109,12 @@ class tareaCrear(generics.CreateAPIView):
 
 #  Actualizar tareas
 class ActualizarTarea(generics.UpdateAPIView):
-    queryset = tarea.objects.all()
+    queryset = tareas.objects.all()
     serializer_class = TareaSerializer
 
     def put(self, request, pk):
-        tareas = get_object_or_404(tarea, pk=pk)
-        serializer = TareaSerializer(tareas, data=request.data)
+        tareas_obj = get_object_or_404(tareas, pk=pk)
+        serializer = TareaSerializer(tareas_obj, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({'success': True, 'detail': 'Tarea actualizada', 'data': serializer.data}, status=status.HTTP_200_OK)
@@ -124,12 +122,12 @@ class ActualizarTarea(generics.UpdateAPIView):
 
 #  Eliminar tareas
 class EliminarTarea(generics.DestroyAPIView):
-    queryset = tarea.objects.all()
+    queryset = tareas.objects.all()
     serializer_class = TareaSerializer
 
     def delete(self, request, pk):
-        tareas = get_object_or_404(tarea, pk=pk)
-        tareas.delete()
+        tarea_obj = get_object_or_404(tareas, pk=pk)
+        tarea_obj.delete()
         return Response({'success': True, 'detail': 'Tarea eliminada correctamente'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -138,10 +136,10 @@ class tareaByfecha(generics.ListAPIView):
     serializer_class = TareaSerializer
 
     def get(self, request, fecha):
-        tareas = tarea.objects.filter(fecha_limite=fecha)
-        if not tareas:
+        tareas_qs = tareas.objects.filter(fecha_limite=fecha)
+        if not tareas_qs:
             return Response({'detail': 'No se encontraron tareas con esa fecha.'})
-        serializer = TareaSerializer(tareas, many=True)
+        serializer = TareaSerializer(tareas_qs, many=True)
         return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -150,10 +148,10 @@ class tareaByrangofecha(generics.ListAPIView):
     serializer_class = TareaSerializer
 
     def get(self, request, fecha_inicio, fecha_fin):
-        tareas = tarea.objects.filter(fecha_limite__range=[fecha_inicio, fecha_fin])
-        if not tareas:
+        tareas_qs = tareas.objects.filter(fecha_limite__range=[fecha_inicio, fecha_fin])
+        if not tareas_qs:
             return Response({'detail': 'No se encontraron tareas en ese rango de fechas.'})
-        serializer = TareaSerializer(tareas, many=True)
+        serializer = TareaSerializer(tareas_qs, many=True)
         return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -161,9 +159,9 @@ class tareaByrangofecha(generics.ListAPIView):
 class tareaBypersona(generics.ListAPIView):
     serializer_class = TareaSerializer
 
-    def get(self, request, persona_id):
-        tareas = tarea.objects.filter(persona__id_personas=persona_id)
-        if not tareas:
+    def get(self, request, documento):
+        tareas_qs = tareas.objects.filter(persona__documento=documento)
+        if not tareas_qs:
             return Response({'detail': 'No se encontraron tareas para esa persona.'})
-        serializer = TareaSerializer(tareas, many=True)
+        serializer = TareaSerializer(tareas_qs, many=True)
         return Response({'success': True, 'detail': 'Tareas encontradas', 'data': serializer.data}, status=status.HTTP_200_OK)

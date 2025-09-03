@@ -19,7 +19,7 @@ urlpatterns = [
     path('tareas/actualizar/<int:pk>/', ActualizarTarea.as_view(), name='tarea-actualizar'),  
     path('tareas/fecha/<str:fecha>/', tareaByfecha.as_view(), name='tarea-by-fecha'),
     path('tareas/rango-fecha/<str:fecha_inicio>/<str:fecha_fin>/', tareaByrangofecha.as_view(), name='tarea-by-rango-fecha'),
-    path('tareas/persona/<int:persona_id>/', tareaBypersona.as_view(), name='tarea-by-persona'),
+    path('tareas/persona/<str:documento>/', tareaBypersona.as_view(), name='tarea-by-persona'),
     path('tareas/eliminar/<int:pk>/', EliminarTarea.as_view(), name='tarea-eliminar'),
 ]
 
