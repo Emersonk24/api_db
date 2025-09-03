@@ -15,8 +15,8 @@ urlpatterns = [
     
     # Rutas de tareas
     path('tareas/', tareaList.as_view(), name='tarea-list'),
-    path('tareas/crear/', tareaCrear.as_view(), name='tarea-crear'),  # 📌 crear tarea
-    path('tareas/actualizar/<int:pk>/', ActualizarTarea.as_view(), name='tarea-actualizar'),  # 📌 actualizar tarea
+    path('tareas/crear/', tareaCrear.as_view(), name='tarea-crear'),  
+    path('tareas/actualizar/<int:pk>/', ActualizarTarea.as_view(), name='tarea-actualizar'),  
     path('tareas/fecha/<str:fecha>/', tareaByfecha.as_view(), name='tarea-by-fecha'),
     path('tareas/rango-fecha/<str:fecha_inicio>/<str:fecha_fin>/', tareaByrangofecha.as_view(), name='tarea-by-rango-fecha'),
     path('tareas/persona/<int:persona_id>/', tareaBypersona.as_view(), name='tarea-by-persona'),
